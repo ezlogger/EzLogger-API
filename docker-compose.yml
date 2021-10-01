@@ -1,0 +1,31 @@
+version: '3.4'
+
+services:
+  webui:
+    image: nglogger.server
+    build:
+      context: .
+      dockerfile: src/WebUI/Dockerfile
+    environment:
+      #- "UseInMemoryDatabase=false"
+      #- "DefaultConnection=Server=db;Database=BoardPACLoggerDb;User=sa;Password=secret@123;MultipleActiveResultSets=true"
+      ##- "ConnectionStrings_DefaultConnection=Server=db;Database=BoardPACLoggerDb;User=sa;Password=secret@123;MultipleActiveResultSets=true"
+      - "IdentityServer__Key__Type=Development"
+      #- "ASPNETCORE_Kestrel__Certificates__Default__Password=Your_password123"
+      #- "ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx"
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    ports:
+      - "5000:5000"
+      #- "5001:5001"
+    depends_on:
+      - db
+    restart: on-failure
+
+  db:
+    image: "mcr.microsoft.com/mssql/server"
+    environment:
+      - "SA_PASSWORD=secret@123"
+      - "ACCEPT_EULA=Y"
+    ports:
+      - "5433:1433"
